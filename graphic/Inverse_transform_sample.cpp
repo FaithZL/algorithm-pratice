@@ -2,7 +2,7 @@
 * @Author: ZhuL
 * @Date:   2018-10-01 12:44:01
 * @Last Modified by:   ZhuL
-* @Last Modified time: 2018-10-01 21:17:19
+* @Last Modified time: 2018-10-01 21:24:20
 */
 
 #include <iostream>
@@ -19,7 +19,9 @@
 using namespace std;
 
 double normalPdf(double x) {
-	return 1 / sqrtf(2 * M_PI) * exp(-x * x * 0.5);
+	double mu = 0;
+	double sigma = 1;
+	return 1 / (sqrtf(2 * M_PI) * sigma) * exp(-(x - mu) * (x - mu) / (2 * sigma * sigma));
 }
 
 class Sampler
@@ -94,7 +96,7 @@ protected:
 int main()
 {
 	// srand((unsigned)time(0));
-	auto sampler = Sampler(normalPdf , 400 , -10 , 10);
+	auto sampler = Sampler(normalPdf , 10000 , -100 , 100);
  
     std::map<int, int> hist{};
     for(int n=0; n<10000; ++n) {
@@ -105,3 +107,11 @@ int main()
                   << p.first << ' ' << std::string(p.second/200, '*') << '\n';
     }
 }
+// output like
+// -3 
+// -2 *
+// -1 ******
+//  0 *********************************
+//  1 ******
+//  2 *
+//  3 
