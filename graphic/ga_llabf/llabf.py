@@ -8,14 +8,15 @@ from rect import Rect
 # (1)面积较大的矩形装入后产生的空洞较大,面积较小的矩形装入后产生的空洞较小;
 # (2)面积较大的矩形装入后产生的空洞常常可以装入面积较小的矩形;
 # (3)装入过程中产生的轮廓线越规整,即组成轮廓线的水平线数量越少，就越有利于后期矩形的装入.
-class LLABF(object):
 
-    # horizontal line
-    class HL(object):
-        def __init__(self, x, width, height):
-            self.x = x
-            self.width = width
-            self.height = height
+# horizontal line
+class HL(object):
+    def __init__(self, x, width, height):
+        self.x = x
+        self.width = width
+        self.height = height
+
+class Box(object):
 
     def __init__(self, rect_list, width=2048, height=2048):
         
@@ -28,6 +29,8 @@ class LLABF(object):
         self.__hl_list = []
 
         self.__height = height
+
+        self.initial()
 
     def initial(self):
         self.__hl_list.append(HL(0, self.__width, 0))
@@ -67,7 +70,7 @@ class LLABF(object):
         for i, rect in enumerate(self.__rect_list):
             if rect.width == width and rect.height in [lh, rh]:
                 satisfy_idx_list.append(i)
-            elif rect.width in [lh, rh] and rect.height == widths:
+            elif rect.width in [lh, rh] and rect.height == width:
                 satisfy_idx_list.append(i)
         
 
@@ -97,7 +100,7 @@ class LLABF(object):
             pass
 
     def lowest_horizontal_line(self):
-        height = self.__size
+        height = self.__height
         ret = -1
         for i, hl in enumerate(self.__hl_list):
             if hl.height < height:
@@ -108,7 +111,7 @@ class LLABF(object):
     def lowest_horizontal_line_height(self, lhl_idx):
         lh = self.left_height(lhl_idx)
         rh = self.right_height(lhl_idx)
-        return rh if rh < lh else lhs
+        return rh if rh < lh else lh
         
     def left_height(self, lhl_idx):
         if lhl_idx == 0:
@@ -120,17 +123,16 @@ class LLABF(object):
             return self.__height - self.__hl_list[lhl_idx].height
         return self.__hl_list[lhl_idx + 1].height - self.__hl_list[lhl_idx].height
 
-        
+    def usage(self):
+        valid_area = 0
+        for rect in self.__filled_rect_list:
+            valid_area += rect.area()
+        return valid_area / (self.__height * self.__width)
 
     # 装填，更新矩形数据，更新水平线数据
     def filling(self, rect_idx, lhl_idx):
         pass
 
 
-class AtlasCache(object):
-    def __init__(self, rect_list, max_width=2048, max_height=2048):
-        self.__rect_list = rect_list
 
-        self.__max_width = max_width
 
-        self.__max_height = max_height

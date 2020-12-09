@@ -13,10 +13,14 @@ class Rect(object):
         self.__id = val
 
     def set_x(self, x):
-        self.__x = y
+        self.__x = x
 
     def set_y(self, y):
         self.__y = y
+
+    @property
+    def id(self):
+        return self.__id
 
     @property
     def transpose(self):
@@ -24,6 +28,12 @@ class Rect(object):
 
     def set_transpose(self, val):
         self.__transpose = val
+        
+    def area(self):
+        return self.__width * self.__height
+
+    def min_area(self):
+        pass
 
     @property
     def x(self):
@@ -40,3 +50,4 @@ class Rect(object):
     @property
     def height(self):
         return self.__height
+    
