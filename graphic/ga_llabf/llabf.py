@@ -72,17 +72,25 @@ class Box(object):
                 satisfy_idx_list.append(i)
             elif rect.width in [lh, rh] and rect.height == width:
                 satisfy_idx_list.append(i)
+        return satisfy_idx_list[0] if satisfy_idx_list else -1
         
 
     # 宽度优先匹配，在装入过程中优先装入宽度或高度与最低水平线相等的矩形，如果存在多个矩形，则装入面积最大的
     # WFF策略装入矩形之后，不会增加轮廓线的数量，该策略的好处是延迟较小矩形被装入的趋势
     def width_fit_first(self, lhl_idx):
+        area = 0
+        idx = -1
+        width = self.__hl_list[lhl_idx].width
         for i, rect in enumerate(self.__rect_list):
-            pass
+            if width in [rect.width, rect.height] and rect.area > area:
+                idx = i
+                area = rect.area
+        return idx
 
     # 高度优先匹配，在装入过程中优先装入，按序列顺序查询高度或宽度不大于最低水平线e_k，并且可以左填平的矩形
     # 与与FFF，WFF不同的是，HFF可能会产生产生更小的可装填区域，但可以提升轮廓线e_k-1的宽度
     def height_fit_first(self, lhl_idx):
+        width = self.__hl_list[lhl_idx].width
         for i, rect in enumerate(self.__rect_list):
             pass
 
