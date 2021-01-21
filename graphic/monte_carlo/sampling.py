@@ -3,6 +3,9 @@
 import numpy as np
 import math
 
+
+PI = 3.1415926535
+
 def clamp(a, l, h):
     if a < l:
         return l
@@ -120,6 +123,12 @@ class Distribution2D(object):
         iu = clamp(int(p[0] * self.__pConditionalV[0].count()), 0, self.__pConditionalV[0].count() - 1)
         iv = clamp(int(p[1] * self.__pMarginal.count()), 0, self.__pMarginal.count() - 1)
         return self.__pConditionalV[iv].func[iu] / self.__pMarginal.integrate()
+
+def square_to_disk(u):
+    r = sqrt(u[0])
+    theta = Pi * u[1]
+    return (r * math.cos(theta), r * math.sin(theta))
+
 
 
 arr = np.random.randint(1, 20, (10, 10))
