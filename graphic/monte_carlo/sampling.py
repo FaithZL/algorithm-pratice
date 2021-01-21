@@ -54,6 +54,13 @@ class Distribution1D(object):
     def count(self):
         return len(self.__func)
     
+    @property
+    def func(self):
+        return self.__func
+    
+    def integrate(self):
+        return self.__funcInt
+    
     def sample_continuous(self, u):
         
         def pred(index):
@@ -95,7 +102,34 @@ class Distribution2D(object):
         for v in range(0, nv):
             d1d = Distribution1D(data[v], nu)
             self.__pConditionalV.append(d1d)
+            
+        marginalFunc = []
+        for v in range(0, nv):
+            marginalFunc.append(self.__pConditionalV[v].integrate())
+        self.__pMarginal = Distribution1D(np.array(marginalFunc, np.float32), nv)
         
+    def sample_continuous(self, u):
+        '''u ∈ [0,1]^2'''
+        d1, pdf1, v = self.__pMarginal.sample_continuous(u[1])
+        d0, pdf0, u = self.__pConditionalV[v].sample_continuous(u[0])
+        pdf = pdf1 * pdf0
+        return d0, d1, pdf
+    
+    def pdf(self, p):
+        '''p ∈ [0,1]^2'''
+        iu = clamp(int(p[0] * self.__pConditionalV[0].count()), 0, self.__pConditionalV[0].count() - 1)
+        iv = clamp(int(p[1] * self.__pMarginal.count()), 0, self.__pMarginal.count() - 1)
+        return self.__pConditionalV[iv].func[iu] / self.__pMarginal.integrate()
 
-# a = np.ones((2,3))
-# print(a)
+
+arr = np.random.randint(1, 20, (10, 10))
+
+s = arr.sum()
+
+arr = arr.astype(np.float32) / s
+
+d2d = Distribution2D(arr)
+
+# print(arr[9][9] /)
+print(d2d.pdf([0.81,0.81]))
+print(d2d.pdf([0.96,0.96]))
